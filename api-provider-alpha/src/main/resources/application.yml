@@ -1,6 +1,15 @@
+logging:
+  level:
+    web: DEBUG
+    de:
+      codecentric:
+        spring:
+          boot:
+            chaos: DEBUG
+
 management:
   health.db.enabled: false
-  endpoints:    
+  endpoints:
     web:
       base-path: /
       exposure:
@@ -18,14 +27,14 @@ jetty:
     
 chaos:
   monkey:
-    enabled: false
+    enabled: true
     watcher:
       restController: true
     assaults:
       exceptionsActive: true
       latencyActive: true   
       latencyRangeStart: 3000
-      latencyRangeEnd: 10000   
+      latencyRangeEnd: 10000
       
 spring:
   profiles:

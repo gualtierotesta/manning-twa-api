@@ -1,0 +1,10 @@
+api-itineraries-search    | 2021-05-16 14:11:39.394 ERROR 1 --- [pool-1-thread-2] c.t.f.a.i.s.s.ItinerariesSearchService   : Error while calling catalog endpoint
+api-itineraries-search    |
+api-itineraries-search    | com.twa.flights.api.itineraries.search.exception.TWAException: Error while calling catalog endpoint
+api-itineraries-search    | 	at com.twa.flights.api.itineraries.search.connector.ProviderAlphaConnector.lambda$availability$2(ProviderAlphaConnector.java:63) ~[classes!/:na]
+api-itineraries-search    | 	Suppressed: reactor.core.publisher.FluxOnAssembly$OnAssemblyException:
+api-itineraries-search    | Error has been observed at the following site(s):
+api-itineraries-search    | 	|_ checkpoint ⇢ 500 from GET api-provider-alpha:8070/api/flights/provider/alpha/itineraries?adults=1&children=1&infants=1&amount=10&departure=2021-05-29,2021-06-03&from=BUE,MIA&to=MIA,BUE [DefaultWebClient]
+api-itineraries-search    | Stack trace:
+api-itineraries-search    | 		at com.twa.flights.api.itineraries.search.connector.ProviderAlphaConnector.lambda$availability$2(ProviderAlphaConnector.java:63) ~[classes!/:na]
+api-itineraries-search    | 		at org.springframework.web.reactive.function.client.DefaultWebClient$DefaultResponseSpec$StatusHandler.apply(DefaultWebClient.java:693) ~[spring-webflux-5.3.3.jar!/:5.3.3]
