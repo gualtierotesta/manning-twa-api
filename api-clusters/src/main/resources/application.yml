@@ -50,4 +50,10 @@ connector:
       host: localhost:7070
       responseTimeout: 10000
       connectionTimeout: 10000
-      readTimeout: 10000         
+      readTimeout: 10000
+
+cache:
+  configuration:
+    catalogCity:
+      maxSize: 1000
+      duration: 15
