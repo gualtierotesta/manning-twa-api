@@ -1,5 +1,16 @@
 version: '3.0'
 services:
+
+  varnish:
+    build: varnish/.
+    container_name: varnish
+    ports:
+      - 6080:80
+    restart: always
+    depends_on:
+      - api-catalog
+
+
   api-catalog:
     build: api-catalog/.
     container_name: api-catalog
