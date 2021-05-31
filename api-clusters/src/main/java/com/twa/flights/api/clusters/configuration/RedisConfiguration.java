@@ -1,5 +1,7 @@
 package com.twa.flights.api.clusters.configuration;
 
+import com.twa.flights.api.clusters.dto.CityDTO;
+import com.twa.flights.api.clusters.serializer.CitySerializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -12,41 +14,64 @@ import com.twa.flights.api.clusters.configuration.settings.RedisSettings;
 import com.twa.flights.api.clusters.dto.ClusterSearchDTO;
 import com.twa.flights.api.clusters.serializer.ClusterSearchSerializer;
 
+import java.util.Map;
+
 @Configuration
 @ConfigurationProperties
 public class RedisConfiguration {
 
-    private RedisSettings redis;
+    private Map<String, RedisSettings> redis;
 
-    private ClusterSearchSerializer clusterSearchSerializer;
+    private final ClusterSearchSerializer clusterSearchSerializer;
+    private final CitySerializer citySerializer;
 
     @Autowired
-    public RedisConfiguration(ClusterSearchSerializer clusterSearchSerializer) {
-        this.clusterSearchSerializer = clusterSearchSerializer;
+    public RedisConfiguration(final ClusterSearchSerializer pClusterSearchSerializer,
+            final CitySerializer pCitySerializer) {
+        clusterSearchSerializer = pClusterSearchSerializer;
+        citySerializer = pCitySerializer;
     }
 
+    // REDIS DB
     @Bean
-    public JedisConnectionFactory jedisConnectionFactory() {
-        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(redis.getHost(),
-                redis.getPort());
+    public JedisConnectionFactory jedisDBConnectionFactory() {
+        RedisSettings settings = redis.get("db");
+        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(settings.getHost(),
+                settings.getPort());
+        return new JedisConnectionFactory(redisStandaloneConfiguration);
+    }
+
+    @Bean(name = "redisTemplate")
+    public RedisTemplate<String, ClusterSearchDTO> redisDBTemplate() {
+        RedisTemplate<String, ClusterSearchDTO> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(jedisDBConnectionFactory());
+        redisTemplate.setValueSerializer(clusterSearchSerializer);
+        return redisTemplate;
+    }
+
+    // REDIS CACHE
+    @Bean
+    public JedisConnectionFactory jedisCacheConnectionFactory() {
+        RedisSettings settings = redis.get("cache");
+        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(settings.getHost(),
+                settings.getPort());
         return new JedisConnectionFactory(redisStandaloneConfiguration);
     }
 
     @Bean
-    public RedisTemplate<String, ClusterSearchDTO> redisTemplate() {
-        RedisTemplate<String, ClusterSearchDTO> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(jedisConnectionFactory());
-
-        redisTemplate.setValueSerializer(clusterSearchSerializer);
-
+    public RedisTemplate<String, CityDTO> redisCacheTemplate() {
+        RedisTemplate<String, CityDTO> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(jedisCacheConnectionFactory());
+        redisTemplate.setValueSerializer(citySerializer);
         return redisTemplate;
     }
 
-    public RedisSettings getRedis() {
+    public Map<String, RedisSettings> getRedis() {
         return redis;
     }
 
-    public void setRedis(RedisSettings redis) {
-        this.redis = redis;
+    public void setRedis(final Map<String, RedisSettings> pRedis) {
+        redis = pRedis;
     }
+
 }

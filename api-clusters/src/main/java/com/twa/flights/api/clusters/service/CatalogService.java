@@ -21,7 +21,7 @@ public class CatalogService {
         this.catalogConnector = catalogConnector;
     }
 
-    @Cacheable("catalogCity")
+    @Cacheable(cacheNames = "catalogCity", unless = "#result == null")
     public CityDTO getCity(String code) {
         LOGGER.debug("Obtain the information for code: {}", code);
         return catalogConnector.getCityByCode(code);
