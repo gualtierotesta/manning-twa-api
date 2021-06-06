@@ -12,21 +12,24 @@ import com.twa.flights.common.dto.enums.Provider;
 import com.twa.flights.common.dto.itinerary.ItineraryDTO;
 import com.twa.flights.common.dto.request.AvailabilityRequestDTO;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+
 @Component
 public class ProviderAlphaFacade implements ProviderFacade {
 
     static final Logger LOGGER = LoggerFactory.getLogger(ProviderAlphaFacade.class);
 
-    ProviderAlphaConnector itinerariesSearchConnector;
+    private ProviderAlphaConnector providerAlphaConnector;
 
     @Autowired
-    public ProviderAlphaFacade(ProviderAlphaConnector itinerariesSearchConnector) {
-        this.itinerariesSearchConnector = itinerariesSearchConnector;
+    public ProviderAlphaFacade(final ProviderAlphaConnector providerAlphaConnector) {
+        this.providerAlphaConnector = providerAlphaConnector;
     }
 
-    public List<ItineraryDTO> availability(AvailabilityRequestDTO request) {
-        LOGGER.debug("Obtain the information about the flights");
-        return itinerariesSearchConnector.availability(request);
+    @CircuitBreaker(name = "provider-alpha")
+    public List<ItineraryDTO> availability(final AvailabilityRequestDTO request) {
+        LOGGER.info("Obtain the information about the flights");
+        return providerAlphaConnector.availability(request);
     }
 
     @Override

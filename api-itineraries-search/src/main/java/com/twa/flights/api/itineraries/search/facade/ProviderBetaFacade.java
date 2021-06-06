@@ -12,19 +12,22 @@ import com.twa.flights.common.dto.enums.Provider;
 import com.twa.flights.common.dto.itinerary.ItineraryDTO;
 import com.twa.flights.common.dto.request.AvailabilityRequestDTO;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+
 @Component
 public class ProviderBetaFacade implements ProviderFacade {
 
-    static final Logger LOGGER = LoggerFactory.getLogger(ProviderBetaFacade.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProviderBetaFacade.class);
 
-    ProviderBetaConnector providerBetaConnector;
+    private ProviderBetaConnector providerBetaConnector;
 
     @Autowired
-    public ProviderBetaFacade(ProviderBetaConnector providerBetaConnector) {
+    public ProviderBetaFacade(final ProviderBetaConnector providerBetaConnector) {
         this.providerBetaConnector = providerBetaConnector;
     }
 
-    public List<ItineraryDTO> availability(AvailabilityRequestDTO request) {
+    @CircuitBreaker(name = "provider-beta")
+    public List<ItineraryDTO> availability(final AvailabilityRequestDTO request) {
         LOGGER.debug("Obtain the information about the flights");
         return providerBetaConnector.availability(request);
     }
